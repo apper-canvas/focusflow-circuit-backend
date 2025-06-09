@@ -1,5 +1,6 @@
-import Home from '../pages/Home';
-import NotFound from '../pages/NotFound';
+import HomePage from '@/components/pages/HomePage';
+// NotFoundPage is typically handled by App.jsx directly for the catch-all route, 
+// not usually part of the explicit route config for display purposes.
 
 export const routes = {
   home: {
@@ -7,7 +8,7 @@ export const routes = {
     label: 'Timer',
     path: '/timer',
     icon: 'Timer',
-    component: Home
+component: HomePage
   }
 };
 

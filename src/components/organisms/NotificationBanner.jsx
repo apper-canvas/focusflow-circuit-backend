@@ -1,5 +1,7 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import ApperIcon from './ApperIcon';
+import ApperIcon from '@/components/ApperIcon';
+import Button from '@/components/atoms/Button';
 
 const NotificationBanner = ({ message, onClose, onStartNext }) => {
   return (
@@ -19,32 +21,32 @@ const NotificationBanner = ({ message, onClose, onStartNext }) => {
             <p className="text-gray-900 font-medium mb-2">{message}</p>
             
             <div className="flex gap-2">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <Button
                 onClick={onStartNext}
                 className="px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                Start Next
-              </motion.button>
-              
-              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+              >
+                Start Next
+              </Button>
+              
+              <Button
                 onClick={onClose}
                 className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Dismiss
-              </motion.button>
+              </Button>
             </div>
           </div>
           
-          <button
+          <Button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded transition-colors"
           >
             <ApperIcon name="X" size={16} className="text-gray-400" />
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>

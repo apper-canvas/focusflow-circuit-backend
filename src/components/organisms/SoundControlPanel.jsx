@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ApperIcon from './ApperIcon';
+import ApperIcon from '@/components/ApperIcon';
+import Button from '@/components/atoms/Button';
+import Input from '@/components/atoms/Input';
 
 const SOUND_OPTIONS = [
   { id: 'none', label: 'No Sound', file: null },
@@ -11,7 +13,7 @@ const SOUND_OPTIONS = [
   { id: 'ocean', label: 'Ocean Waves', file: '/sounds/ocean.mp3' }
 ];
 
-const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
+const SoundControlPanel = ({ settings, onSettingsUpdate, audioRef }) => {
   const [showControls, setShowControls] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const ambientAudioRef = useRef(null);
@@ -84,15 +86,15 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
   
   return (
     <div className="relative">
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <Button
         onClick={() => setShowControls(!showControls)}
         className="p-3 bg-white/20 hover:bg-white/30 text-white rounded-xl backdrop-blur-sm transition-colors"
         title="Sound Controls"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         <ApperIcon name={settings?.soundEnabled ? 'Volume2' : 'VolumeX'} size={20} />
-      </motion.button>
+      </Button>
       
       <AnimatePresence>
         {showControls && (
@@ -110,7 +112,7 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
                 </label>
                 <div className="space-y-2">
                   {SOUND_OPTIONS.map((sound) => (
-                    <button
+                    <Button
                       key={sound.id}
                       onClick={() => handleSoundChange(sound.id)}
                       className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors ${
@@ -123,7 +125,7 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
                       {currentSound.id === sound.id && (
                         <ApperIcon name="Check" size={16} />
                       )}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -136,12 +138,12 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
                   </label>
                   <div className="flex items-center gap-2">
                     <ApperIcon name="VolumeX" size={16} className="text-gray-400" />
-                    <input
+                    <Input
                       type="range"
                       min="0"
                       max="100"
                       value={settings.soundVolume || 50}
-                      onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
+                      onChange={(val) => handleVolumeChange(parseInt(val))}
                       className="flex-1"
                     />
                     <ApperIcon name="Volume2" size={16} className="text-gray-400" />
@@ -155,7 +157,7 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
               {/* Ambient sound play/pause */}
               {settings?.soundEnabled && settings.soundType !== 'none' && (
                 <div className="pt-2 border-t border-gray-200">
-                  <button
+                  <Button
                     onClick={toggleAmbientSound}
                     className="w-full flex items-center justify-center gap-2 p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                   >
@@ -163,7 +165,7 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
                     <span className="text-sm">
                       {isPlaying ? 'Stop' : 'Preview'} {currentSound.label}
                     </span>
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -174,4 +176,4 @@ const SoundControls = ({ settings, onSettingsUpdate, audioRef }) => {
   );
 };
 
-export default SoundControls;
+export default SoundControlPanel;

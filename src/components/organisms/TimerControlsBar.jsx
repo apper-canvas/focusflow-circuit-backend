@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import ApperIcon from './ApperIcon';
+import React from 'react';
+import ApperIcon from '@/components/ApperIcon';
+import Button from '@/components/atoms/Button';
 
 const TIMER_STATUS = {
   IDLE: 'idle',
@@ -8,7 +9,7 @@ const TIMER_STATUS = {
   COMPLETED: 'completed'
 };
 
-const TimerControls = ({ 
+const TimerControlsBar = ({ 
   timerStatus, 
   onPlayPause, 
   onReset, 
@@ -26,40 +27,40 @@ const TimerControls = ({
   return (
     <div className="flex items-center justify-center gap-4">
       {/* Reset button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <Button
         onClick={onReset}
         className="p-3 bg-white/20 hover:bg-white/30 text-white rounded-xl backdrop-blur-sm transition-colors"
         title="Reset (R)"
-      >
-        <ApperIcon name="RotateCcw" size={20} />
-      </motion.button>
-      
-      {/* Play/Pause button */}
-      <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+      >
+        <ApperIcon name="RotateCcw" size={20} />
+      </Button>
+      
+      {/* Play/Pause button */}
+      <Button
         onClick={onPlayPause}
         className="flex items-center gap-2 px-8 py-4 bg-white text-primary rounded-xl font-semibold shadow-lg hover:shadow-xl transition-shadow"
         title="Start/Pause (Space)"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         <ApperIcon name={getPlayPauseIcon()} size={20} />
         <span>{getPlayPauseLabel()}</span>
-      </motion.button>
+      </Button>
       
       {/* Settings button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <Button
         onClick={onSettingsClick}
         className="p-3 bg-white/20 hover:bg-white/30 text-white rounded-xl backdrop-blur-sm transition-colors"
         title="Settings"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         <ApperIcon name="Settings" size={20} />
-      </motion.button>
+      </Button>
     </div>
   );
 };
 
-export default TimerControls;
+export default TimerControlsBar;
