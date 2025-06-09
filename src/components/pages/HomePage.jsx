@@ -6,6 +6,7 @@ import TimerControlsBar from '@/components/organisms/TimerControlsBar';
 import SessionStatsOverview from '@/components/organisms/SessionStatsOverview';
 import SoundControlPanel from '@/components/organisms/SoundControlPanel';
 import SettingsModal from '@/components/organisms/SettingsModal';
+import TaskInputModal from '@/components/organisms/TaskInputModal';
 import NotificationBanner from '@/components/organisms/NotificationBanner';
 import { settingsService, sessionService, statsService } from '@/services';
 
@@ -33,10 +34,12 @@ const HomePage = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [sessionCount, setSessionCount] = useState(0);
   
-  // UI state
+// UI state
   const [showSettings, setShowSettings] = useState(false);
+  const [showTaskInput, setShowTaskInput] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  const [pendingTaskLabel, setPendingTaskLabel] = useState('');
   
   // Refs
   const intervalRef = useRef(null);
@@ -97,26 +100,35 @@ const HomePage = () => {
     return () => clearInterval(intervalRef.current);
   }, [timerStatus]);
   
-  const handlePlayPause = () => {
-    if (timerStatus === TIMER_STATUS.IDLE || timerStatus === TIMER_STATUS.PAUSED) {
+const handlePlayPause = () => {
+    if (timerStatus === TIMER_STATUS.IDLE) {
+      // Show task input modal before starting new session
+      setShowTaskInput(true);
+    } else if (timerStatus === TIMER_STATUS.PAUSED) {
       setTimerStatus(TIMER_STATUS.RUNNING);
-      
-      if (timerStatus === TIMER_STATUS.IDLE) {
-        // Start new session
-        const newSession = {
-          id: Date.now().toString(),
-          startTime: new Date(),
-          endTime: null,
-          duration: getCurrentDuration(),
-          type: timerState,
-          completed: false,
-          taskLabel: null
-        };
-        setCurrentSession(newSession);
-      }
     } else if (timerStatus === TIMER_STATUS.RUNNING) {
       setTimerStatus(TIMER_STATUS.PAUSED);
     }
+  };
+  
+  const handleTaskSubmit = (taskLabel) => {
+    setPendingTaskLabel(taskLabel);
+    startNewSession(taskLabel);
+  };
+  
+  const startNewSession = (taskLabel) => {
+    setTimerStatus(TIMER_STATUS.RUNNING);
+    
+    const newSession = {
+      id: Date.now().toString(),
+      startTime: new Date(),
+      endTime: null,
+      duration: getCurrentDuration(),
+      type: timerState,
+      completed: false,
+      taskLabel: taskLabel
+    };
+    setCurrentSession(newSession);
   };
   
   const handleReset = () => {
@@ -293,11 +305,12 @@ const HomePage = () => {
               formatTime={formatTime}
             />
             
-            <TimerControlsBar
+<TimerControlsBar
               timerStatus={timerStatus}
               onPlayPause={handlePlayPause}
               onReset={handleReset}
               onSettingsClick={() => setShowSettings(true)}
+              currentTaskLabel={currentSession?.taskLabel || pendingTaskLabel}
             />
           </div>
         </div>
@@ -321,6 +334,13 @@ const HomePage = () => {
             />
           )}
         </AnimatePresence>
+        
+{/* Task input modal */}
+        <TaskInputModal
+          isOpen={showTaskInput}
+          onClose={() => setShowTaskInput(false)}
+          onSubmit={handleTaskSubmit}
+        />
         
         {/* Settings modal */}
         <AnimatePresence>
