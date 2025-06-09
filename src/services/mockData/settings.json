@@ -1,0 +1,10 @@
+{
+  "workDuration": 25,
+  "shortBreakDuration": 5,
+  "longBreakDuration": 15,
+  "autoStartBreaks": false,
+  "autoStartPomodoros": false,
+  "soundEnabled": true,
+  "soundType": "none",
+  "soundVolume": 50
+}
