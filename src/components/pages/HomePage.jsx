@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import MainTimer from '@/components/organisms/MainTimer';
 import TimerControlsBar from '@/components/organisms/TimerControlsBar';
 import SessionStatsOverview from '@/components/organisms/SessionStatsOverview';
@@ -24,10 +26,14 @@ const TIMER_STATUS = {
 };
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.user);
+  
   const [settings, setSettings] = useState(null);
   const [stats, setStats] = useState(null);
   const [currentSession, setCurrentSession] = useState(null);
-  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   // Timer state
   const [timerState, setTimerState] = useState(TIMER_STATES.WORK);
   const [timerStatus, setTimerStatus] = useState(TIMER_STATUS.IDLE);
@@ -45,9 +51,21 @@ const HomePage = () => {
   const intervalRef = useRef(null);
   const audioRef = useRef(null);
   
+// Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
   // Load initial data
   useEffect(() => {
+    if (!isAuthenticated) return;
+    
     const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
         const [settingsData, statsData] = await Promise.all([
           settingsService.getSettings(),
@@ -58,12 +76,16 @@ const HomePage = () => {
         setStats(statsData);
         setTimeRemaining(settingsData.workDuration * 60);
       } catch (error) {
+        console.error('Failed to load data:', error);
+        setError('Failed to load application data');
         toast.error('Failed to load data');
+      } finally {
+        setLoading(false);
       }
     };
     
     loadData();
-  }, []);
+  }, [isAuthenticated]);
   
   // Keyboard shortcuts
   useEffect(() => {
@@ -268,15 +290,36 @@ const handlePlayPause = () => {
     }
   };
   
-  // Get background gradient class based on timer state
+// Get background gradient class based on timer state
   const getBackgroundClass = () => {
     return timerState === TIMER_STATES.WORK ? 'gradient-work' : 'gradient-break';
   };
-  
-  if (!settings || !stats) {
+
+  // Show loading state
+  if (loading || !settings || !stats) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="h-screen flex items-center justify-center bg-surface-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-surface-600">Loading FocusFlow...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-surface-50">
+        <div className="text-center">
+          <p className="text-error mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -303,9 +346,9 @@ const handlePlayPause = () => {
               timerStatus={timerStatus}
               progress={getProgressPercentage()}
               formatTime={formatTime}
-            />
+/>
             
-<TimerControlsBar
+            <TimerControlsBar
               timerStatus={timerStatus}
               onPlayPause={handlePlayPause}
               onReset={handleReset}
@@ -333,9 +376,9 @@ const handlePlayPause = () => {
               onStartNext={startNextSession}
             />
           )}
-        </AnimatePresence>
+</AnimatePresence>
         
-{/* Task input modal */}
+        {/* Task input modal */}
         <TaskInputModal
           isOpen={showTaskInput}
           onClose={() => setShowTaskInput(false)}
